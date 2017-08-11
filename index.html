@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<head>
+  <title>Doping Bicyclists</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <style>
+
+  .axis {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .well {
+    background-color: rgba(255,255,255,0.5);
+    padding: 5px;
+    font-size: 16px;
+  }
+
+  p:hover {
+    cursor: pointer;
+  }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="text-center">Doping Bicyclists</h1>
+        <div id="chart"></div>
+        <p id="description"></p>
+        <p><strong>Github repository found at : </strong><a href="https://github.com/ncabelin/d3-gdp-barchart.git">https://github.com/ncabelin/d3-gdp-barchart.git</a></p>
+      </div>
+    </div>
+  </div>
+<!-- <script src="GDP-data.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+<script>
+$(document).ready(function() {
+  $.ajax({
+    type: 'GET',
+    url: 'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json'
+  }).done(function(result) {
+    var data = JSON.parse(result);
+    //console.log(data);
+    data.forEach(function(d) {
+      d.SecondsRank = Math.abs(data[0].Seconds - d.Seconds);
+    });
+    console.log(data);
+    renderScatterplot(data);
+  }).fail(function(err) {
+    console.log(err);
+  });
+
+  // data array consists of
+  /*
+
+  1. Doping
+  2. Name - 
+  3. Nationality
+  4. Place
+  5. Seconds
+  6. Time
+  7. Url
+  8. Year
+
+  y-axis will be ranking (Place)
+  x-axis will be time in (Seconds)
+    convert seconds to #1 rank seconds minus current seconds 
+    conver to minutes
+  */
+
+  function renderScatterplot(data) {
+   
+    console.log(d3.max(data, function(d) { return d.SecondsRank; }));
+
+    var margin = {top: 20, right: 15, bottom: 60, left: 60}
+      , width = 960 - margin.left - margin.right
+      , height = 500 - margin.top - margin.bottom;
+    
+    var x = d3.scale.linear()
+              .domain([0, 200])
+              .range([ width, 0 ]);
+    
+    var y = d3.scale.linear()
+            .domain([0, 40])
+            .range([ 0, height ]);
+ 
+    var chart = d3.select('#chart')
+  .append('svg:svg')
+  .attr('width', width + margin.right + margin.left)
+  .attr('height', height + margin.top + margin.bottom)
+  .attr('class', 'chart')
+
+    var main = chart.append('g')
+  .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+  .attr('width', width)
+  .attr('height', height)
+  .attr('class', 'main')   
+        
+    // draw the x axis
+    var xAxis = d3.svg.axis()
+  .scale(x)
+  .orient('bottom');
+
+    main.append('g')
+  .attr('transform', 'translate(0,' + height + ')')
+  .attr('class', 'main axis date')
+  .call(xAxis);
+
+    // draw the y axis
+    var yAxis = d3.svg.axis()
+  .scale(y)
+  .orient('left');
+
+    main.append('g')
+  .attr('transform', 'translate(0,0)')
+  .attr('class', 'main axis date')
+  .call(yAxis);
+
+    var g = main.append("svg:g"); 
+    
+    g.selectAll("scatter-dots")
+      .data(data)
+      .enter().append("svg:circle")
+          .attr("cx", function (d,i) { return x(d.SecondsRank); } )
+          .attr("cy", function (d) { return y(d.Place); } )
+          .attr("r", 8);
+  }
+});
+</script>
+
+</body>
+
+
+
