@@ -6,6 +6,25 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
   <style>
 
+  body {
+    color: white;
+    background: linear-gradient(
+      rgba(0,0,0,0.5),
+      rgba(0,0,0,0.5)
+    ), url('http://res.cloudinary.com/dd6kwd0zn/image/upload/q_auto:low/v1502505318/maico-amorim-57141_ucwljc.jpg') center no-repeat;
+    background-size: cover;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+  }
+
+  a {
+    color: #84b4de;
+  }
+
+  a:hover {
+    color: #84b4de;
+  }
+
   .axis {
     font: 10px sans-serif;
   }
@@ -13,12 +32,16 @@
   .axis path,
   .axis line {
     fill: none;
-    stroke: #000;
+    stroke: white;
     shape-rendering: crispEdges;
   }
 
+  text {
+    color: white;
+  }
+
   .well {
-    background-color: rgba(255,255,255,0.5);
+    background-color: rgba(0,0,0,0.5);
     padding: 5px;
     font-size: 16px;
   }
@@ -34,10 +57,12 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        <h1 class="text-center">Doping Bicyclists</h1>
+        <h1 class="text-center">Doping in Professional Bicycle Racing</h1>
+        <p class="lead text-center">35 Fastest times up Alpe d'Huez</p>
         <div id="chart"></div>
         <p id="description"></p>
-        <p><strong>Github repository found at : </strong><a href="https://github.com/ncabelin/d3-gdp-barchart.git">https://github.com/ncabelin/d3-gdp-barchart.git</a></p>
+        <p><strong>freeCodeCamp project :</strong> by <a href="https://mike.cabelin.com">Neptune Michael Cabelin</a></p>
+        <p><strong>Github repository found at : </strong><a href="https://github.com/ncabelin/d3-scatterplot.git">https://github.com/ncabelin/d3-scatterplot.git</a></p>
       </div>
     </div>
   </div>
@@ -61,8 +86,6 @@ $(document).ready(function() {
   }).fail(function(err) {
     console.log(err);
   });
-
-  // data array consists of
   /*
 
   1. Doping
@@ -77,19 +100,21 @@ $(document).ready(function() {
   y-axis will be ranking (Place)
   x-axis will be time in (Seconds)
     convert seconds to #1 rank seconds minus current seconds 
-    conver to minutes
+    convert to minutes
   */
 
   function renderScatterplot(data) {
-   
-    console.log(d3.max(data, function(d) { return d.SecondsRank; }));
+    // div to render bar labels with
+    var div = d3.select(".container").append("div")
+              .attr("class", "tooltip")
+              .style("opacity", 0);
 
     var margin = {top: 20, right: 15, bottom: 60, left: 60}
-      , width = 960 - margin.left - margin.right
+      , width = 700 - margin.left - margin.right
       , height = 500 - margin.top - margin.bottom;
     
     var x = d3.scale.linear()
-              .domain([0, 200])
+              .domain([-50, 250])
               .range([ width, 0 ]);
     
     var y = d3.scale.linear()
@@ -116,7 +141,14 @@ $(document).ready(function() {
     main.append('g')
   .attr('transform', 'translate(0,' + height + ')')
   .attr('class', 'main axis date')
-  .call(xAxis);
+  .style("fill", "white")
+  .call(xAxis)
+  .append("text")
+  .style("text-anchor", "end")
+  .attr("dx", "50em")
+  .attr("dy", "3em")
+  .text("SECONDS AFTER 1st PLACE")
+    .style("fill", "white");
 
     // draw the y axis
     var yAxis = d3.svg.axis()
@@ -126,7 +158,15 @@ $(document).ready(function() {
     main.append('g')
   .attr('transform', 'translate(0,0)')
   .attr('class', 'main axis date')
-  .call(yAxis);
+  .style("fill", "white")
+  .call(yAxis)
+  .append("text")
+  .attr("transform", "rotate(-90)")
+  .attr("y", 6)
+  .attr("dy", ".71em")
+  .style("text-anchor", "end")
+  .text("RANKING")
+  .style("fill", "white");
 
     var g = main.append("svg:g"); 
     
@@ -135,7 +175,39 @@ $(document).ready(function() {
       .enter().append("svg:circle")
           .attr("cx", function (d,i) { return x(d.SecondsRank); } )
           .attr("cy", function (d) { return y(d.Place); } )
-          .attr("r", 8);
+          .attr("r", 5)
+          .style("fill", function(d,i) {
+            return data[i].Doping ? "red" : "green";
+            })
+          .on("mouseover", function(d, i) {
+            d3.select(this).style("fill", "orange");
+            div.transition().duration(100).style("opacity", 1);
+            div.html("<div class='well'><p><strong>" + data[i].Name + 
+              "</strong><br><div class='small'>" + data[i].Doping + "</div><div>" + 
+              data[i].Time + " minutes</div></p></div>")
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY + 60) + "px");
+          })
+          .on("mouseout", function(d, i) {
+            d3.select(this).style("fill", "red");
+            div.html("");
+          });
+
+        g.selectAll("text")
+          .data(data)
+          .enter()
+          .append("text")
+          .style("fill", "white")
+          .text(function(d) {
+            return d.Name;
+          })
+          .attr("x", function(d) {
+            return x(d.SecondsRank) + 10;  // Returns scaled location of x
+          })
+          .attr("y", function(d) {
+            return y(d.Place) + 10;  // Returns scaled circle y
+          })
+          .style("font-size", "10px");
   }
 });
 </script>
