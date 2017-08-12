@@ -75,7 +75,8 @@ $(document).ready(function() {
     url: 'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json'
   }).done(function(result) {
     var data = JSON.parse(result);
-    //console.log(data);
+    // convert seconds to ranking from first place
+    // data is already sorted beforehand
     data.forEach(function(d) {
       d.SecondsRank = Math.abs(data[0].Seconds - d.Seconds);
     });
@@ -85,9 +86,10 @@ $(document).ready(function() {
     console.log(err);
   });
   /*
+  DATA :
 
   1. Doping
-  2. Name - 
+  2. Name 
   3. Nationality
   4. Place
   5. Seconds
