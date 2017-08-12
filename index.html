@@ -61,8 +61,8 @@
         <p class="lead text-center">35 Fastest times up Alpe d'Huez</p>
         <div id="chart"></div>
         <p id="description"></p>
-        <p><strong>freeCodeCamp project :</strong> by <a href="https://mike.cabelin.com">Neptune Michael Cabelin</a></p>
-        <p><strong>Github repository found at : </strong><a href="https://github.com/ncabelin/d3-scatterplot.git">https://github.com/ncabelin/d3-scatterplot.git</a></p>
+        <span><strong>freeCodeCamp project :</strong> by <a href="https://mike.cabelin.com">Neptune Michael Cabelin</a> ---
+        <strong>Github repository found at : </strong><a href="https://github.com/ncabelin/d3-scatterplot.git">https://github.com/ncabelin/d3-scatterplot.git</a></span>
       </div>
     </div>
   </div>
@@ -182,14 +182,14 @@ $(document).ready(function() {
           .on("mouseover", function(d, i) {
             d3.select(this).style("fill", "orange");
             div.transition().duration(100).style("opacity", 1);
-            div.html("<div class='well'><p><strong>" + data[i].Name + 
-              "</strong><br><div class='small'>" + data[i].Doping + "</div><div>" + 
-              data[i].Time + " minutes</div></p></div>")
+            div.html("<div class='well'><p><strong>#" + data[i].Place + " " + data[i].Name + 
+              "</strong><br><div class='small'>" + data[i].Doping + "</div><div>Time -" + 
+              data[i].Time + " min.  Year - " + data[i].Year + "</div></p></div>")
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY + 60) + "px");
           })
           .on("mouseout", function(d, i) {
-            d3.select(this).style("fill", "red");
+            d3.select(this).style("fill", function() { return data[i].Doping ? "red" : "green"; });
             div.html("");
           });
 
